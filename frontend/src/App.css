@@ -1,0 +1,159 @@
+.app {
+  min-height: 100vh;
+  padding: 32px;
+  background-color: #f4f6f8;
+  color: #1f2937;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 32px;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.count {
+  margin-bottom: 24px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.filters div {
+  display: flex;
+  min-width: 160px;
+  flex-direction: column;
+  gap: 6px;
+}
+
+label {
+  color: #374151;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+select {
+  min-width: 160px;
+  padding: 9px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  background-color: white;
+  color: #1f2937;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.status {
+  color: #4b5563;
+  font-size: 16px;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.table-container {
+  overflow-x: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+}
+
+table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  background-color: #1f2937;
+  color: white;
+  font-size: 14px;
+}
+
+td {
+  font-size: 14px;
+}
+
+tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.reason {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.MISSING_IN_B {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.ORPHAN_IN_B {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.DUPLICATE_IN_B {
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+
+.VALUE_MISMATCH {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.empty {
+  padding: 32px;
+  color: #6b7280;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters div,
+  select {
+    width: 100%;
+  }
+}
