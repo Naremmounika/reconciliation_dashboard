@@ -11,7 +11,7 @@ function App() {
 
   const [reason, setReason] = useState('')
   const [locationId, setLocationId] = useState('')
-  const [orgId, setOrgId] = useState('')
+  const [orgId, setOrgId] = useState('ORG-A')
   const [sortBy, setSortBy] = useState('')
 
   useEffect(() => {
@@ -20,9 +20,7 @@ function App() {
 
     const params = new URLSearchParams()
 
-    if (orgId) {
-      params.append('org_id', orgId)
-    }
+    params.append('org_id', orgId)
 
     if (reason) {
       params.append('reason', reason)
@@ -36,11 +34,7 @@ function App() {
       params.append('sort', sortBy)
     }
 
-    const queryString = params.toString()
-
-    const url = queryString
-      ? `${API_URL}?${queryString}`
-      : API_URL
+    const url = `${API_URL}?${params.toString()}`
 
     fetch(url)
       .then(response => {
@@ -51,7 +45,7 @@ function App() {
         return response.json()
       })
       .then(data => {
-        setResults(data.results)
+        setResults(data.results || [])
         setLoading(false)
       })
       .catch(() => {
@@ -82,7 +76,7 @@ function App() {
             value={orgId}
             onChange={event => setOrgId(event.target.value)}
           >
-            <option value="">All organizations</option>
+            <option value="">Select organization</option>
             <option value="ORG-A">ORG-A</option>
             <option value="ORG-B">ORG-B</option>
           </select>
@@ -166,13 +160,17 @@ function App() {
                     key={`${result.record_id}-${result.reason}-${index}`}
                   >
                     <td>{result.record_id}</td>
+
                     <td>{result.location_id}</td>
+
                     <td>
                       <span className={`reason ${result.reason}`}>
                         {result.reason}
                       </span>
                     </td>
+
                     <td>{result.system_a_value || '-'}</td>
+
                     <td>
                       {Array.isArray(result.system_b_value)
                         ? result.system_b_value.join(', ')
