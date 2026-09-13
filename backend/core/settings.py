@@ -132,8 +132,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
 
+# CORS settings
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://reconciliation-dashboard-kq54.vercel.app",
+    "https://reconciliation-dashboard-kq54-git-main-mounikaprojects1.vercel.app",
+    "https://reconciliation-dashboard-kq54-evypoabfh-mounikaprojects1.vercel.app",
 ]
