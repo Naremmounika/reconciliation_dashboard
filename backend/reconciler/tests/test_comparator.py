@@ -1,5 +1,6 @@
-from django.test import SimpleTestCase
+from django.test import TestCase
 
+from reconciler.models import Location, SystemARecord
 from reconciler.services.comparator import compare_records
 
 
@@ -18,10 +19,15 @@ class FakeEntry:
         self.value = value
 
 
-class ComparatorTests(SimpleTestCase):
+class ComparatorTests(TestCase):
+
     def test_missing_record_in_system_b(self):
         system_a = [
-            FakeRecord("REC-1001", "LOC-201", "100.00"),
+            FakeRecord(
+                "REC-1001",
+                "LOC-201",
+                "100.00",
+            ),
         ]
 
         system_b = []
@@ -29,46 +35,136 @@ class ComparatorTests(SimpleTestCase):
         results = compare_records(system_a, system_b)
 
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["reason"], "MISSING_IN_B")
+        self.assertEqual(
+            results[0]["reason"],
+            "MISSING_IN_B",
+        )
 
     def test_orphan_record_in_system_b(self):
         system_a = []
 
         system_b = [
-            FakeEntry("ENT-1", "REC-9999", "LOC-201", "100.00"),
+            FakeEntry(
+                "ENT-1",
+                "REC-9999",
+                "LOC-201",
+                "100.00",
+            ),
         ]
 
         results = compare_records(system_a, system_b)
 
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["reason"], "ORPHAN_IN_B")
+        self.assertEqual(
+            results[0]["reason"],
+            "ORPHAN_IN_B",
+        )
 
     def test_duplicate_record_in_system_b(self):
         system_a = [
-            FakeRecord("REC-1001", "LOC-201", "100.00"),
+            FakeRecord(
+                "REC-1001",
+                "LOC-201",
+                "100.00",
+            ),
         ]
 
         system_b = [
-            FakeEntry("ENT-1", "REC-1001", "LOC-201", "100.00"),
-            FakeEntry("ENT-2", "REC-1001", "LOC-201", "100.00"),
+            FakeEntry(
+                "ENT-1",
+                "REC-1001",
+                "LOC-201",
+                "100.00",
+            ),
+            FakeEntry(
+                "ENT-2",
+                "REC-1001",
+                "LOC-201",
+                "100.00",
+            ),
         ]
 
         results = compare_records(system_a, system_b)
 
-        reasons = [result["reason"] for result in results]
+        reasons = [
+            result["reason"]
+            for result in results
+        ]
 
-        self.assertIn("DUPLICATE_IN_B", reasons)
+        self.assertIn(
+            "DUPLICATE_IN_B",
+            reasons,
+        )
 
     def test_value_mismatch(self):
         system_a = [
-            FakeRecord("REC-1001", "LOC-201", "100.00"),
+            FakeRecord(
+                "REC-1001",
+                "LOC-201",
+                "100.00",
+            ),
         ]
 
         system_b = [
-            FakeEntry("ENT-1", "REC-1001", "LOC-201", "150.00"),
+            FakeEntry(
+                "ENT-1",
+                "REC-1001",
+                "LOC-201",
+                "150.00",
+            ),
         ]
 
         results = compare_records(system_a, system_b)
 
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["reason"], "VALUE_MISMATCH")
+        self.assertEqual(
+            results[0]["reason"],
+            "VALUE_MISMATCH",
+        )
+
+    def test_tenant_boundary_isolation(self):
+        Location.objects.create(
+            location_id="LOC-A",
+            org_id="ORG-A",
+            location_name="Location A",
+        )
+
+        Location.objects.create(
+            location_id="LOC-B",
+            org_id="ORG-B",
+            location_name="Location B",
+        )
+
+        SystemARecord.objects.create(
+            record_id="REC-A",
+            location_id="LOC-A",
+            total_value="100",
+        )
+
+        SystemARecord.objects.create(
+            record_id="REC-B",
+            location_id="LOC-B",
+            total_value="200",
+        )
+
+        from django.test import Client
+
+        client = Client()
+
+        response = client.get(
+            "/api/discrepancies/?org_id=ORG-A"
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        results = response.json()["results"]
+
+        self.assertTrue(
+            all(
+                result["location_id"] == "LOC-A"
+                for result in results
+            )
+        )

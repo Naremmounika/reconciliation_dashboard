@@ -8,6 +8,13 @@ from .services.comparator import compare_records
 @require_GET
 def discrepancies(request):
     org_id = request.GET.get("org_id")
+    if not org_id:
+        return JsonResponse(
+            {
+                "error": "org_id query parameter is required"
+            },
+            status=400,
+        )
     system_a_records = SystemARecord.objects.all()
     system_b_entries = SystemBEntry.objects.all()
 
